@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">AnotherProject</string>
+    <string name="braille_letters">Braille Letters</string>
+    <string name="braille_numbers">Braille Numbers</string>
+    <string name="correct">Correct</string>
+    <string name="count">Count</string>
+    <string name="abc_s">ABC\'s</string>
+    <string name="search">Search</string>
+    <string name="settings">PAIRED DEVICES</string>
+    <string name="exercise">Train your Braille Skill</string>
+    <string name="familiarization">Get to Know Braille</string>
+    <string name="interactive_braille_system">Interactive Braille System</string>
+    <string name="todo">TODO</string>
+</resources>
