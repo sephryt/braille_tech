@@ -11,4 +11,6 @@
     <string name="familiarization">Get to Know Braille</string>
     <string name="interactive_braille_system">Interactive Braille System</string>
     <string name="todo">TODO</string>
+    <string name="users_name">User Name</string>
+    <string name="confirm_name">confirm name</string>
 </resources>

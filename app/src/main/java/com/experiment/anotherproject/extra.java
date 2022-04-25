@@ -503,4 +503,214 @@ First set = 001111 =15; Inverted = 110000 = 48
         downActuator();
     }
 }
+
+if (resetCount==1){
+              actuatorRefresh(48,2100,400);//#
+              actuatorRefresh(41,2100,400);//0
+              actuatorRefresh(48,2100,400);//#
+              actuatorRefresh(31,2100,400);//1
+              actuatorRefresh(48,2100,400);//#
+              actuatorRefresh(15,2100,400);//2
+              actuatorRefresh(48,2100,400);//#
+              actuatorRefresh(27,2100,400);//3
+              actuatorRefresh(48,2100,400);//#
+              actuatorRefresh(25,2100,400);//4
+              actuatorRefresh(48,2100,400);//#
+              actuatorRefresh(29,2100,400);//5
+              actuatorRefresh(48,2100,400);//#
+              actuatorRefresh(11,2100,400);//6
+              actuatorRefresh(48,2100,400);//#
+              actuatorRefresh(9,2100,400);//7
+              actuatorRefresh(48,2100,400);//#
+              actuatorRefresh(13,2100,400);//8
+              actuatorRefresh(48,2100,400);//#
+              actuatorRefresh(43,2100,400);//9
+            }
+            if (resetAbc==1){
+              actuatorRefresh(31,3500,500);//a
+              actuatorRefresh(15,3500,500);//b
+              actuatorRefresh(27,3500,500);//c
+              actuatorRefresh(25,3500,500);//d
+              actuatorRefresh(29,3500,500);//e
+              actuatorRefresh(11,3500,500);//f
+              actuatorRefresh(9,3500,500);//g
+              actuatorRefresh(13,3500,500);//h
+              actuatorRefresh(43,3500,500);//i
+              actuatorRefresh(41,3500,500);//j
+              actuatorRefresh(23,3500,500);//k
+              actuatorRefresh(7,3500,500);//l
+              actuatorRefresh(19,3500,500);//m
+              actuatorRefresh(17,3500,500);//n
+              actuatorRefresh(21,3500,500);//o
+              actuatorRefresh(3,3500,500);//p
+              actuatorRefresh(1,3500,500);//q
+              actuatorRefresh(5,3500,500);//r
+              actuatorRefresh(35,3500,500);//s
+              actuatorRefresh(33,3500,500);//t
+              actuatorRefresh(22,3500,500);//u
+              actuatorRefresh(6,3500,500);//v
+              actuatorRefresh(40,3500,500);//w
+              actuatorRefresh(18,3500,500);//x
+              actuatorRefresh(16,3500,500);//y
+              actuatorRefresh(20,3500,500);//z
+            }
+            void childIN(int cnt){
+           switch (cnt)
+           {
+              case 1:
+              actuatorRefresh(31,3500,500);
+              counter=cnt;
+              break;
+              case 2:
+              actuatorRefresh(15,3500,500);//b
+              counter=cnt;
+              break;
+              case 3:
+              actuatorRefresh(27,3500,500);//c
+              counter=cnt;
+              break;
+              case 4:
+              actuatorRefresh(25,3500,500);//d
+              counter=cnt;
+              break;
+              case 5:
+              actuatorRefresh(29,3500,500);//e
+              counter=cnt;
+              break;
+              case 6:
+              actuatorRefresh(11,3500,500);//f
+              counter=cnt;
+              break;
+              case 7:
+              actuatorRefresh(9,3500,500);//g
+              counter=cnt;
+              break;
+              case 8:
+              actuatorRefresh(13,3500,500);//h
+              counter=cnt;
+              break;
+              case 9:
+              actuatorRefresh(43,3500,500);//i
+              counter=cnt;
+              break;
+              case 10:
+              actuatorRefresh(41,3500,500);//j
+              counter=cnt;
+              break;
+              case 11:
+              actuatorRefresh(23,3500,500);//k
+              counter=cnt;
+              break;
+              case 12:
+              actuatorRefresh(7,3500,500);//l
+              counter=cnt;
+              break;
+              case 13:
+              actuatorRefresh(19,3500,500);//m
+              counter=cnt;
+              break;
+              case 14:
+              actuatorRefresh(17,3500,500);//n
+              counter=cnt;
+              break;
+              case 15:
+              actuatorRefresh(21,3500,500);//o
+              counter=cnt;
+              break;
+              case 16:
+              actuatorRefresh(3,3500,500);//p
+              counter=cnt;
+              break;
+              case 17:
+              actuatorRefresh(1,3500,500);//q
+              counter=cnt;
+              break;
+              case 18:
+              actuatorRefresh(5,3500,500);//r
+              counter=cnt;
+              break;
+              case 19:
+              actuatorRefresh(35,3500,500);//s
+              counter=cnt;
+              break;
+              case 20:
+              actuatorRefresh(33,3500,500);//t
+              counter=cnt;
+              break;
+              case 21:
+              actuatorRefresh(22,3500,500);//u
+              counter=cnt;
+              break;
+              case 22:
+              actuatorRefresh(6,3500,500);//v
+              counter=cnt;
+              break;
+              case 23:
+              actuatorRefresh(40,3500,500);//w
+              counter=cnt;
+              break;
+              case 24:
+              actuatorRefresh(18,3500,500);//x
+              counter=cnt;
+              break;
+              case 25:
+              actuatorRefresh(16,3500,500);//y
+              counter=cnt;
+              break;
+              case 26:
+              actuatorRefresh(20,3500,500);//z
+              counter=cnt;
+              break;
+              case 27:
+              actuatorRefresh(48,2100,400);
+              actuatorRefresh(41,2100,400);//0
+              counter=cnt;
+              break;
+              case 28:
+              actuatorRefresh(48,2100,400);
+              actuatorRefresh(31,2100,400);//1
+              counter=cnt;
+              break;
+              case 29:
+              actuatorRefresh(48,2100,400);
+              actuatorRefresh(15,2100,400);//2
+              counter=cnt;
+              break;
+              case 30:
+              actuatorRefresh(48,2100,400);
+              actuatorRefresh(27,2100,400);//3
+              counter=cnt;
+              break;
+              case 31:
+              actuatorRefresh(48,2100,400);
+              actuatorRefresh(25,2100,400);//4
+              counter=cnt;
+              break;
+              case 32:
+              actuatorRefresh(48,2100,400);
+              actuatorRefresh(29,2100,400);//5
+              counter=cnt;
+              break;
+              case 33:
+              actuatorRefresh(48,2100,400);
+              actuatorRefresh(11,2100,400);//6
+              counter=cnt;
+              break;
+              case 34:
+              actuatorRefresh(48,2100,400);
+              actuatorRefresh(9,2100,400);//7
+              counter=cnt;
+              break;
+              case 35:
+              actuatorRefresh(48,2100,400);
+              actuatorRefresh(13,2100,400);//8
+              counter=cnt;
+              break;
+              case 36:
+              actuatorRefresh(48,2100,400);
+              actuatorRefresh(43,2100,400);//9
+              counter=cnt;
+              break;
+            }
+      }
 */

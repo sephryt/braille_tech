@@ -11,6 +11,8 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.speech.tts.TextToSpeech;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.transition.AutoTransition;
 import android.transition.TransitionManager;
 import android.util.Log;
@@ -19,6 +21,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -36,8 +39,10 @@ import java.util.Set;
 import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity {
-    Button search,btn_fam,btn_exe;
+    Button search,btn_fam,btn_exe,confirmN;
+    EditText nameUser;
     CardView cardView;
+    String Uname;
     ConstraintLayout expandableView, settingsView;
     private ListView listView;
     ImageView pic1, pic2;
@@ -52,6 +57,8 @@ public class MainActivity extends AppCompatActivity {
     private static final String DEVICE_LIST_SELECTED = "com.example.anotherproject.devicelistselected";
     public static final String BUFFER_SIZE = "com.example.anotherproject.buffersize";
     private static final String TAG = "BlueTest5-MainActivity";
+    public static final String SHARED_PREFS = "sharedPrefs";
+    public static final String TEXT ="text";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,7 +67,8 @@ public class MainActivity extends AppCompatActivity {
 
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LOCKED);
-
+        nameUser = findViewById(R.id.userName);
+        confirmN = findViewById(R.id.confirmName);
         btn_fam = findViewById(R.id.btn_familiarization);
         btn_exe = findViewById(R.id.btn_exercise);
         search = findViewById(R.id.btn_search);
@@ -69,15 +77,14 @@ public class MainActivity extends AppCompatActivity {
         pic2 = findViewById(R.id.image3);
 
         expandableView = findViewById(R.id.expandableView);
-
         cardView = findViewById(R.id.cardview);
         listView = findViewById(R.id.listview);
-
         mBTAdapter = BluetoothAdapter.getDefaultAdapter();
+
         txts = new TextToSpeech(getApplicationContext(), status -> {
             if (status ==TextToSpeech.SUCCESS)
             {
-                String spike = "Welcome to Braille Tech App";
+                String spike = "Welcome to Braille Learning App";
                 Log.d(TAG, "Opened App" + " Opened the App Successfully");
                 txts.setLanguage(Locale.getDefault());
                 txts.setSpeechRate(0.7f);
@@ -95,8 +102,50 @@ public class MainActivity extends AppCompatActivity {
                 pic1.setImageResource(R.drawable.ic_dropdown_arrow);
                 pic2.setImageResource(R.drawable.ic_dropdown_arrow); } });
 
-        btn_exe.setOnClickListener(v -> {
+        Uname = nameUser.getText().toString();
+        SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
+        String conf = sharedPreferences.getString(TEXT, "");
+        if(conf.isEmpty()){
+            msg("No User Name Yet");
+        }else {
+            nameUser.setText(conf);
+        }
 
+        confirmN.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Uname = nameUser.getText().toString();
+                if(Uname.isEmpty()){
+                    txts = new TextToSpeech(getApplicationContext(), status -> {
+                        if (status ==TextToSpeech.SUCCESS)
+                        {
+                            String spike = "Kindly put the user's name on the field, thank you";
+                            txts.setLanguage(Locale.getDefault());
+                            txts.setSpeechRate(0.8f);
+                            txts.speak(spike, TextToSpeech.QUEUE_FLUSH, null); } });
+
+
+                }else{
+                    txts = new TextToSpeech(getApplicationContext(), status -> {
+                        if (status ==TextToSpeech.SUCCESS)
+                        {
+                            String spike = "Welcome "+Uname+", Lets learn braille";
+                            txts.setLanguage(Locale.getDefault());
+                            txts.setSpeechRate(0.8f);
+                            txts.speak(spike, TextToSpeech.QUEUE_FLUSH, null); } });
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    if (!sharedPreferences.getString(TEXT,"").isEmpty())
+                    {
+                        editor.clear().apply();
+                    }
+                    editor.putString(TEXT, Uname);
+                    editor.apply();
+                }
+            }
+        });
+
+        btn_exe.setOnClickListener(v -> {
+            Uname = nameUser.getText().toString();
             if (!mBTAdapter.isEnabled()){
                 try{msg("Bluetooth is not available");
                 }catch (Exception e){
@@ -113,8 +162,10 @@ public class MainActivity extends AppCompatActivity {
                 intent.putExtra(DEVICE_EXTRA, device);
                 intent.putExtra(DEVICE_UUID, mDeviceUUID.toString());
                 intent.putExtra(BUFFER_SIZE, mBufferSize);
+                intent.putExtra("nameUSER", Uname);
                 startActivity(intent); } });
         btn_fam.setOnClickListener(v -> {
+            Uname = nameUser.getText().toString();
             BluetoothDevice device = ((MyAdapter) (listView.getAdapter())).getSelectedItem();
             if (!mBTAdapter.isEnabled()&&device==null){
                 try{msg("Bluetooth is not available");
@@ -132,6 +183,7 @@ public class MainActivity extends AppCompatActivity {
                 intent.putExtra(DEVICE_EXTRA, device);
                 intent.putExtra(DEVICE_UUID, mDeviceUUID.toString());
                 intent.putExtra(BUFFER_SIZE, mBufferSize);
+                intent.putExtra("nameUSER", Uname);
                 startActivity(intent);
             }
         });
@@ -165,7 +217,8 @@ public class MainActivity extends AppCompatActivity {
             } else {
                 new SearchDevices().execute();
             }
-        }); }
+        });
+    }
 
     private static class MyAdapter extends ArrayAdapter<BluetoothDevice> {
         private int selectedIndex;
@@ -270,6 +323,7 @@ public class MainActivity extends AppCompatActivity {
                 break;
         }
         super.onActivityResult(requestCode, resultCode, data); }
+
     private class SearchDevices extends AsyncTask<Void, Void, List<BluetoothDevice>> {
 
         @Override

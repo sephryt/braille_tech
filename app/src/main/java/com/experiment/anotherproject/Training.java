@@ -2,6 +2,8 @@ package com.experiment.anotherproject;
 
 import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
 import android.speech.tts.TextToSpeech;
@@ -13,8 +15,10 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Locale;
 import java.util.UUID;
 
@@ -32,7 +36,6 @@ public class Training extends AppCompatActivity {
     private TextToSpeech tts;
     boolean mBluetoothConnected =false;
     BluetoothConnectionService mBluetoothConnection;
-
     final static String inStream_a = "01";//a
     final static String inStream_b = "02";//b
     final static String inStream_c = "03";//c
@@ -70,6 +73,9 @@ public class Training extends AppCompatActivity {
     final static String inStream_eight = "38";//on
     final static String inStream_nine = "39";//off
     final static String inStream_zero = "30";//blink
+    public static final String SHARED_PREFS = "sharedPrefs";
+    public static final String TEXT ="text";
+    private String name;
     private static final String TAG = "BlueTest5-Controlling";
     private final ArrayList<String> letterArray = new ArrayList<>();
     private final ArrayList<String> countArray = new ArrayList<>();
@@ -77,6 +83,45 @@ public class Training extends AppCompatActivity {
     private final ArrayList<ImageButton> imageButtonsCountArray = new ArrayList<>();
     private final ArrayList<String> confirmStringLetter = new ArrayList<>();
     private final ArrayList<String> confirmStringNumber = new ArrayList<>();
+    private final String[] letterA = {"a", "hey", "aye","A", "Hey", "Aye"};
+    private final String[] letterB = {"B", "Bee", "Me", "b", "bee", "me"};
+    private final String[] letterC = {"C", "Sea", "See", "c", "sea", "see" };
+    private final String[] letterD = {"Did", "dee", "Dee", "d", "D", "did"};
+    private final String[] letterE = {"E", "Ee","He", "e", "he", "ee"};
+    private final String[] letterF = {"F", "Ef", "Ff", "f", "eff", "fff"};
+    private final String[] letterG = {"G", "Gee", "Gg", "g", "gee", "gii"};
+    private final String[] letterH = {"H", "Itch", "Etch", "h", "itch", "etch"};
+    private final String[] letterI = {"Eye", "Aye", "I", "i", "aye", "eye"};
+    private final String[] letterJ = {"J", "jay", "jj",  "j", "Jay", "Jj"};
+    private final String[] letterK = {"K", "Kay", "kk",  "k", "kay", "kei"};
+    private final String[] letterL = {"L", "Ll", "l", "el", "ll"};
+    private final String[] letterM = {"M", "Am", "mm", "m", "em", "am"};
+    private final String[] letterN= {"N", "In", "nn", "n", "en", "in"};
+    private final String[] letterO = {"O", "Oh", "oo", "o", "oh", "ou"};
+    private final String[] letterP = {"p", "Pee", "Pp", "p", "Pee", "pp"};
+    private final String[] letterQ = {"Q", "Cue", "qq", "q", "cue", "queue"};
+    private final String[] letterR = {"R", "Are", "Our", "r", "are", "our"};
+    private final String[] letterS = {"s", "Is", "ss", "s", "es", "is"};
+    private final String[] letterT = {"T", "Tea", "tt", "t", "tee", "tea"};
+    private final String[] letterU = {"U", "You", "Uu", "u", "you", "uu"};
+    private final String[] letterV = {"V", "Vv", "Vee", "v", "vee", "vv"};
+    private final String[] letterW = {"W", "Ww", "Www", "w", "ww", "w w"};
+    private final String[] letterX = {"X", "Text", "Sex", "x", "text", "sex"};
+    private final String[] letterY = {"Y", "Yy", "Why", "y", "yy", "why"};
+    private final String[] letterZ = {"Z", "Zee", "Say", "z", "zee", "say"};
+
+
+    private final String[] numberZero = {"Zero", "00", "000", "zero", "0", "cero"};
+    private final String[] numberOne = {"One", "1", "Launch", "one", "wan", "launch"};
+    private final String[] numberTwo = {"Two", "too", "2", "two", "22", "to"};
+    private final String[] numberThree = {"3", "33", "Three", "three", "tree", "say"};
+    private final String[] numberFour = {"4", "Four", "For", "four", "for", "44"};
+    private final String[] numberFive = {"55", "555", "Five", "five", "5", "hi"};
+    private final String[] numberSix = {"66", "Six", "sick", "six", "6", "pics"};
+    private final String[] numberSeven = {"7 7", "Seven", "Heaven", "seven", "heaven", "7"};
+    private final String[] numberEight = {"Eight", "8 8", "8", "eight", "ate", "hey"};
+    private final String[] numberNine = {"9 9", "99", "Nine", "nine", "time", "9"};
+
     private UUID mDeviceUUID;
     private BluetoothDevice mDevice;
 
@@ -208,15 +253,17 @@ public class Training extends AppCompatActivity {
         confirmStringNumber.add("8");
         confirmStringNumber.add("9");
 
+        SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS,MODE_PRIVATE);
+        name = sharedPreferences.getString(TEXT,"");
 
         tts = new TextToSpeech(getApplicationContext(), status -> {
             if (status == TextToSpeech.SUCCESS) {
-                String spike = "Train your Braille skills";
+                String spike = "Welcome "+name+" to Train your Braille skills";
                 tts.setLanguage(Locale.getDefault());
+                tts.setSpeechRate(0.6f);
                 tts.speak(spike, TextToSpeech.QUEUE_FLUSH, null);
             }
         });
-
 
             tv_converter.addTextChangedListener(new TextWatcher() {
                 @Override
@@ -228,154 +275,158 @@ public class Training extends AppCompatActivity {
                 public void onTextChanged(CharSequence s, int start, int before, int count) {
                 }
 
+                @RequiresApi(api = Build.VERSION_CODES.N)
                 @Override
 
                 public void afterTextChanged(Editable s) {
-
-                    if (testingVoice(tvCatcher(tv_converter), "a", "hey", "aye") && letterConfirm.equals("A")) {
-                        reply("Good Job, that is letter A, Do you wanna continue learning braille?");
+                    String strInput = tvCatcher(tv_converter);
+                    if (possibleWords(strInput,letterA) && letterConfirm.equals("A")) {
+                        reply("Good Job "+name+", that is letter A, Do you wanna continue learning braille?");
                         mBluetoothConnection.write(letterArray.get(0).getBytes());
                     }
-                    else if (testingVoice(tvCatcher(tv_converter), "b", "bee", "me")&& letterConfirm.equals("B")) {
-                        reply("Good Job, that is letter B, Do you wanna continue learning braille?");
+                    else if (possibleWords(strInput, letterB) && letterConfirm.equals("B")) {
+                        reply("Good Job "+name+", that is letter B, Do you wanna continue learning braille?");
                         mBluetoothConnection.write(letterArray.get(1).getBytes());
                     }
-                    else if (testingVoice(tvCatcher(tv_converter), "c", "sea", "see")&& letterConfirm.equals("C")) {
-                        reply("Good Job, that is letter C, Do you wanna continue learning braille?");
+                    else if (possibleWords(strInput, letterC)&& letterConfirm.equals("C")) {
+                        reply("Good Job "+name+", that is letter C, Do you wanna continue learning braille?");
                         mBluetoothConnection.write(letterArray.get(2).getBytes());
                     }
-                    else if (testingVoice(tvCatcher(tv_converter), "d", "dee", "did")&& letterConfirm.equals("D")) {
-                        reply("Good Job, that is letter D, Do you wanna continue learning braille?");
+                    else if (possibleWords(strInput, letterD)&& letterConfirm.equals("D")) {
+                        reply("Good Job "+name+", that is letter D, Do you wanna continue learning braille?");
                         mBluetoothConnection.write(letterArray.get(3).getBytes());
                     }
-                    else if (testingVoice(tvCatcher(tv_converter), "e", "he", "eeeee")&& letterConfirm.equals("E")) {
-                        reply("Good Job, that is letter E, Do you wanna continue learning braille?");
+                    else if (possibleWords(strInput, letterE)&& letterConfirm.equals("E")) {
+                        reply("Good Job "+name+", that is letter E, Do you wanna continue learning braille?");
                         mBluetoothConnection.write(letterArray.get(4).getBytes());
                     }
-                    else if (testingVoice(tvCatcher(tv_converter), "f", "eff", "fff")&& letterConfirm.equals("F")) {
-                        reply("Good Job, that is letter F, Do you wanna continue learning braille?");
+                    else if (possibleWords(strInput, letterF)&& letterConfirm.equals("F")) {
+                        reply("Good Job "+name+", that is letter F, Do you wanna continue learning braille?");
                         mBluetoothConnection.write(letterArray.get(5).getBytes());
                     }
-                    else if (testingVoice(tvCatcher(tv_converter), "g", "gee", "gii")&& letterConfirm.equals("G")) {
-                        reply("Good Job, that is letter G, Do you wanna continue learning braille?");
+                    else if (possibleWords(strInput, letterG)&& letterConfirm.equals("G")) {
+                        reply("Good Job "+name+", that is letter G, Do you wanna continue learning braille?");
                         mBluetoothConnection.write(letterArray.get(6).getBytes());
                     }
-                    else if (testingVoice(tvCatcher(tv_converter), "h", "itch", "etch")&& letterConfirm.equals("H")) {
-                        reply("Good Job, that is letter H , Do you wanna continue learning braille?");
+                    else if (possibleWords(strInput, letterH)&& letterConfirm.equals("H")) {
+                        reply("Good Job "+name+", that is letter H , Do you wanna continue learning braille?");
                         mBluetoothConnection.write(letterArray.get(7).getBytes());
                     }
-                    else if (testingVoice(tvCatcher(tv_converter), "i", "aye", "eye")&& letterConfirm.equals("I")) {
-                        reply("Good Job, that is letter I, Do you wanna continue learning braille?");
+                    else if (possibleWords(strInput, letterI)&& letterConfirm.equals("I")) {
+                        reply("Good Job "+name+", that is letter I, Do you wanna continue learning braille?");
                         mBluetoothConnection.write(letterArray.get(8).getBytes());
                     }
-                    else if (testingVoice(tvCatcher(tv_converter), "j", "Jay", "jhay")&& letterConfirm.equals("J")) {
-                        reply("Good Job, that is letter J, Do you wanna continue learning braille?");
+                    else if (possibleWords(strInput, letterJ)&& letterConfirm.equals("J")) {
+                        reply("Good Job "+name+", that is letter J, Do you wanna continue learning braille?");
                         mBluetoothConnection.write(letterArray.get(9).getBytes());
                     }
-                    else if (testingVoice(tvCatcher(tv_converter), "k", "kay", "kei")&& letterConfirm.equals("K")) {
-                        reply("Good Job, that is letter K, Do you wanna continue learning braille?");
+                    else if (possibleWords(strInput, letterK)&& letterConfirm.equals("K")) {
+                        reply("Good Job "+name+", that is letter K, Do you wanna continue learning braille?");
                         mBluetoothConnection.write(letterArray.get(10).getBytes());
                     }
-                    else if (testingVoice(tvCatcher(tv_converter), "l", "el", "ell")&& letterConfirm.equals("L")) {
-                        reply("Good Job, that is letter L, Do you wanna continue learning braille?");
+                    else if (possibleWords(strInput, letterL)&& letterConfirm.equals("L")) {
+                        reply("Good Job "+name+", that is letter L, Do you wanna continue learning braille?");
                         mBluetoothConnection.write(letterArray.get(11).getBytes());
                     }
-                    else if (testingVoice(tvCatcher(tv_converter), "m", "em", "am")&& letterConfirm.equals("M")) {
-                        reply("Good Job, that is letter M, Do you wanna continue learning braille?");
+                    else if (possibleWords(strInput, letterM)&& letterConfirm.equals("M")) {
+                        reply("Good Job "+name+", that is letter M, Do you wanna continue learning braille?");
                         mBluetoothConnection.write(letterArray.get(12).getBytes());
                     }
-                    else if (testingVoice(tvCatcher(tv_converter), "n", "en", "in")&& letterConfirm.equals("N")) {
-                        reply("Good Job, that is letter N, Do you wanna continue learning braille?");
+                    else if (possibleWords(strInput, letterN)&& letterConfirm.equals("N")) {
+                        reply("Good Job "+name+", that is letter N, Do you wanna continue learning braille?");
                         mBluetoothConnection.write(letterArray.get(13).getBytes());
                     }
-                    else if (testingVoice(tvCatcher(tv_converter), "o", "oh", "ou")&& letterConfirm.equals("O")) {
-                        reply("Good Job, that is letter O, Do you wanna continue learning braille?");
+                    else if (possibleWords(strInput, letterO)&& letterConfirm.equals("O")) {
+                        reply("Good Job "+name+", that is letter O, Do you wanna continue learning braille?");
                         mBluetoothConnection.write(letterArray.get(14).getBytes());
                     }
-                    else if (testingVoice(tvCatcher(tv_converter), "p", "Pee", "pp")&& letterConfirm.equals("P")) {
-                        reply("Good Job, that is letter P , Do you wanna continue learning braille?");
+                    else if (possibleWords(strInput, letterP)&& letterConfirm.equals("P")) {
+                        reply("Good Job "+name+", that is letter P , Do you wanna continue learning braille?");
                         mBluetoothConnection.write(letterArray.get(15).getBytes());
                     }
-                    else if (testingVoice(tvCatcher(tv_converter), "q", "cue", "queue")&& letterConfirm.equals("Q")) {
-                        reply("Good Job, that is letter Q, Do you wanna continue learning braille?");
+                    else if (possibleWords(strInput, letterQ)&& letterConfirm.equals("Q")) {
+                        reply("Good Job "+name+", that is letter Q, Do you wanna continue learning braille?");
                         mBluetoothConnection.write(letterArray.get(16).getBytes());
                     }
-                    else if (testingVoice(tvCatcher(tv_converter), "r", "are", "our")&& letterConfirm.equals("R")) {
-                        reply("Good Job, that is letter R, Do you wanna continue learning braille?");
+                    else if (possibleWords(strInput, letterR)&& letterConfirm.equals("R")) {
+                        reply("Good Job "+name+", that is letter R, Do you wanna continue learning braille?");
                         mBluetoothConnection.write(letterArray.get(17).getBytes());
                     }
-                    else if (testingVoice(tvCatcher(tv_converter), "s", "es", "is")&& letterConfirm.equals("S")) {
-                        reply("Good Job, that is letter S, Do you wanna continue learning braille?");
+                    else if (possibleWords(strInput, letterS)&& letterConfirm.equals("S")) {
+                        reply("Good Job "+name+", that is letter S, Do you wanna continue learning braille?");
                         mBluetoothConnection.write(letterArray.get(18).getBytes());
                     }
-                    else if (testingVoice(tvCatcher(tv_converter), "t", "tee", "tea")&& letterConfirm.equals("T")) {
-                        reply("Good Job, that is letter T, Do you wanna continue learning braille?");
+                    else if (possibleWords(strInput, letterT)&& letterConfirm.equals("T")) {
+                        reply("Good Job "+name+", that is letter T, Do you wanna continue learning braille?");
                         mBluetoothConnection.write(letterArray.get(19).getBytes());
                     }
-                    else if (testingVoice(tvCatcher(tv_converter), "u", "you", "uu")&& letterConfirm.equals("U")) {
-                        reply("Good Job, that is letter U, Do you wanna continue learning braille?");
+                    else if (possibleWords(strInput, letterU)&& letterConfirm.equals("U")) {
+                        reply("Good Job "+name+", that is letter U, Do you wanna continue learning braille?");
                         mBluetoothConnection.write(letterArray.get(20).getBytes());
                     }
-                    else if (testingVoice(tvCatcher(tv_converter), "v", "vee", "vv")&& letterConfirm.equals("V")) {
-                        reply("Good Job, that is letter V, Do you wanna continue learning braille?");
+                    else if (possibleWords(strInput, letterV)&& letterConfirm.equals("V")) {
+                        reply("Good Job "+name+", that is letter V, Do you wanna continue learning braille?");
                         mBluetoothConnection.write(letterArray.get(21).getBytes());
                     }
-                    else if (testingVoice(tvCatcher(tv_converter), "w", "ww", "w w")&& letterConfirm.equals("W")) {
-                        reply("Good Job, that is letter W, Do you wanna continue learning braille?");
+                    else if (possibleWords(strInput, letterW)&& letterConfirm.equals("W")) {
+                        reply("Good Job "+name+", that is letter W, Do you wanna continue learning braille?");
                         mBluetoothConnection.write(letterArray.get(22).getBytes());
                     }
-                    else if (testingVoice(tvCatcher(tv_converter), "x", "text", "sex")&& letterConfirm.equals("X")) {
-                        reply("Good Job, that is letter X, Do you wanna continue learning braille?");
+                    else if (possibleWords(strInput, letterX)&& letterConfirm.equals("X")) {
+                        reply("Good Job "+name+", that is letter X, Do you wanna continue learning braille?");
                         mBluetoothConnection.write(letterArray.get(23).getBytes());
                     }
-                    else if (testingVoice(tvCatcher(tv_converter), "y", "yy", "why")&& letterConfirm.equals("Y")) {
-                        reply("Good Job, that is letter Y, Do you wanna continue learning braille?");
+                    else if (possibleWords(strInput, letterY)&& letterConfirm.equals("Y")) {
+                        reply("Good Job "+name+", that is letter Y, Do you wanna continue learning braille?");
                         mBluetoothConnection.write(letterArray.get(24).getBytes());
                     }
-                    else if (testingVoice(tvCatcher(tv_converter), "z", "zee", "say")&& letterConfirm.equals("Z")) {
-                        reply("Good Job, that is letter Z, Do you wanna continue learning braille?");
+                    else if (possibleWords(strInput, letterZ)&& letterConfirm.equals("Z")) {
+                        reply("Good Job "+name+", that is letter Z, Do you wanna continue learning braille?");
                         mBluetoothConnection.write(letterArray.get(25).getBytes());
                     }
 
-                    else if (testingVoice(tvCatcher(tv_converter), "zero", "0", "cero")&& letterConfirm.equals("0")) {
-                        reply("Good Job, that is number zero, Do you wanna continue learning braille?");
+                    else if (possibleWords(strInput, numberZero)&& letterConfirm.equals("0")) {
+                        reply("Good Job "+name+", that is number zero, Do you wanna continue learning braille?");
                         mBluetoothConnection.write(letterArray.get(9).getBytes());
                     }
-                    else if (testingVoice(tvCatcher(tv_converter), "one", "wan", "launch")&& letterConfirm.equals("1")) {
-                        reply("Good Job, that is number one, Do you wanna continue learning braille?");
+                    else if (possibleWords(strInput, numberOne)&& letterConfirm.equals("1")) {
+                        reply("Good Job "+name+", that is number one, Do you wanna continue learning braille?");
                         mBluetoothConnection.write(letterArray.get(0).getBytes());
                     }
-                    else if (testingVoice(tvCatcher(tv_converter), "two", "22", "to")&& letterConfirm.equals("2")) {
-                        reply("Good Job, that is number two, Do you wanna continue learning braille?");
+                    else if (possibleWords(strInput, numberTwo)&& letterConfirm.equals("2")) {
+                        reply("Good Job "+name+", that is number two, Do you wanna continue learning braille?");
                         mBluetoothConnection.write(letterArray.get(1).getBytes());
                     }
-                    else if (testingVoice(tvCatcher(tv_converter), "three", "tree", "say")&& letterConfirm.equals("3")) {
-                        reply("Good Job, that is number three, Do you wanna continue learning braille?");
+                    else if (possibleWords(strInput, numberThree)&& letterConfirm.equals("3")) {
+                        reply("Good Job "+name+", that is number three, Do you wanna continue learning braille?");
                         mBluetoothConnection.write(letterArray.get(2).getBytes());
                     }
-                    else if (testingVoice(tvCatcher(tv_converter), "four", "for", "fore")&& letterConfirm.equals("4")) {
-                        reply("Good Job, that is number four, Do you wanna continue learning braille?");
+                    else if (possibleWords(strInput, numberFour)&& letterConfirm.equals("4")) {
+                        reply("Good Job "+name+", that is number four, Do you wanna continue learning braille?");
                         mBluetoothConnection.write(letterArray.get(3).getBytes());
                     }
-                    else if (testingVoice(tvCatcher(tv_converter), "five", "5", "hi")&& letterConfirm.equals("5")) {
-                        reply("Good Job, that is number five Do you wanna continue learning braille?");
+                    else if (possibleWords(strInput, numberFive)&& letterConfirm.equals("5")) {
+                        reply("Good Job "+name+", that is number five Do you wanna continue learning braille?");
                         mBluetoothConnection.write(letterArray.get(4).getBytes());
                     }
-                    else if (testingVoice(tvCatcher(tv_converter), "six", "6", "pics")&& letterConfirm.equals("6")) {
-                        reply("Good Job, that is number six, Do you wanna continue learning braille?");
+                    else if (possibleWords(strInput, numberSix)&& letterConfirm.equals("6")) {
+                        reply("Good Job "+name+", that is number six, Do you wanna continue learning braille?");
                         mBluetoothConnection.write(letterArray.get(5).getBytes());
                     }
-                    else if (testingVoice(tvCatcher(tv_converter), "seven", "heaven", "7")&& letterConfirm.equals("7")) {
-                        reply("Good Job, that is number seven, Do you wanna continue learning braille?");
+                    else if (possibleWords(strInput, numberSeven)&& letterConfirm.equals("7")) {
+                        reply("Good Job "+name+", that is number seven, Do you wanna continue learning braille?");
                         mBluetoothConnection.write(letterArray.get(6).getBytes());
                     }
-                    else if (testingVoice(tvCatcher(tv_converter), "eight", "ate", "hey")&& letterConfirm.equals("8")) {
-                        reply("Good Job, that is number eight, Do you wanna continue learning braille?");
+                    else if (possibleWords(strInput, numberEight)&& letterConfirm.equals("8")) {
+                        reply("Good Job "+name+", that is number eight, Do you wanna continue learning braille?");
                         mBluetoothConnection.write(letterArray.get(7).getBytes());
                     }
-                    else if (testingVoice(tvCatcher(tv_converter), "nine", "time", "9")&& letterConfirm.equals("9")) {
-                        reply("Good Job, that is number nine, Do you wanna continue learning braille?");
+                    else if (possibleWords(strInput, numberNine)&& letterConfirm.equals("9")) {
+                        reply("Good Job "+name+", that is number nine, Do you wanna continue learning braille?");
                         mBluetoothConnection.write(letterArray.get(8).getBytes());
+                    }
+                    else{
+                        tryagain();
                     }
                 }
             });
@@ -412,15 +463,6 @@ public class Training extends AppCompatActivity {
     }
 
 
-    public Boolean testingVoice(String s, String s1, String s2, String s3) {
-        if (s.equals(s1) || s.equals(s2) || s.equals(s3)) {
-            return true;
-        } else {
-            tryagain();
-            return false;
-        }
-    }
-
     private void msg(String s) {
         Toast.makeText(Training.this, s, Toast.LENGTH_SHORT).show();
     }
@@ -447,11 +489,10 @@ public class Training extends AppCompatActivity {
             }
         });
     }
-
     public void reply(String s) {
         tts = new TextToSpeech(getApplicationContext(), status -> {
             if (status == TextToSpeech.SUCCESS) {
-
+                tts.setSpeechRate(0.8f);
                 tts.setLanguage(Locale.getDefault());
                 tts.speak(s, TextToSpeech.QUEUE_FLUSH, null);
             }
@@ -474,9 +515,14 @@ public class Training extends AppCompatActivity {
         startActivity(intent);
         msg("Main Menu");
     }
-
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    public static boolean possibleWords(String inputStr, String[] items) {
+        return Arrays.stream(items).anyMatch(inputStr::contains);
+    }
     @Override
     protected void onUserLeaveHint() {
         super.onUserLeaveHint();
     }
+
 }
+

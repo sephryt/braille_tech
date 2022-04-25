@@ -5,8 +5,10 @@ import android.bluetooth.BluetoothDevice;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.speech.tts.TextToSpeech;
 import android.util.Log;
 import android.widget.Button;
@@ -39,10 +41,10 @@ public class GetToKnow extends AppCompatActivity {
     boolean timerStarted=false;
     Timer timer;
     TimerTask timerTask;
-    int arrayNum=0, arrayNumCount=0, secondArrayNum=0;
+    int arrayNum=0, arrayNumCount=0;
     boolean abclimit= false,  countlimit= false, mBluetoothConnected =false;
     private String buttonIndicator="";
-    String getStringArray;
+    String inStreamResetCounter = "77";
     boolean letterFinished = false;
     final static String inStream_a="01";//a
     final static String inStream_b="02";//b
@@ -81,9 +83,12 @@ public class GetToKnow extends AppCompatActivity {
     final static String inStream_seven="37";//7
     final static String inStream_eight="38";//8
     final static String inStream_nine="39";//9
+    public static final String SHARED_PREFS = "sharedPrefs";
+    public static final String TEXT ="text";
     private static final String TAG = "BlueTest5-Controlling";
     private UUID mDeviceUUID;
     private BluetoothDevice mDevice;
+    private String name;
     private final ArrayList<String> letterArray = new ArrayList<>();
     private final ArrayList<String> countArray = new ArrayList<>();
     private final ArrayList<Integer> abcMp3 = new ArrayList<>();
@@ -94,7 +99,6 @@ public class GetToKnow extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_get_to_know);
         btn_abcde = findViewById(R.id.btn_abc);
         btn_count = findViewById(R.id.btn_count);
@@ -104,7 +108,7 @@ public class GetToKnow extends AppCompatActivity {
         mDeviceUUID = UUID.fromString(b.getString(MainActivity.DEVICE_UUID));
         int mMaxChars = b.getInt(MainActivity.BUFFER_SIZE);
         mBluetoothConnection = new BluetoothConnectionService(GetToKnow.this);
-        timer = new Timer();
+
         imageButtonsAbcArray.add(imagea=findViewById(R.id.gtk_a));
         imageButtonsAbcArray.add(imageb= findViewById(R.id.gtk_b));
         imageButtonsAbcArray.add(imagec= findViewById(R.id.gtk_c));
@@ -219,58 +223,57 @@ public class GetToKnow extends AppCompatActivity {
         countMp3.add(R.raw.numseven);
         countMp3.add(R.raw.numeight);
         countMp3.add(R.raw.numnine);
-
+        SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS,MODE_PRIVATE);
+        name = sharedPreferences.getString(TEXT,"");
         Log.d(TAG, "Parcels " + mDevice + "" + mDeviceUUID + "" + mMaxChars);
-
             if(!mBluetoothConnected) {
                 mBluetoothConnection.convertBoolean(true);
                 startConnection();
-
             }
-
         txts = new TextToSpeech(getApplicationContext(), status -> {
             if (status ==TextToSpeech.SUCCESS)
             {
                 Log.d(TAG,"TTS " + "TTS SUCCESS");
-                String spike = "Get to Know the Braille Alphabet";
+                String spike = "Welcome "+name+", to Get to Know the Braille Alphabet";
                 txts.setLanguage(Locale.getDefault());
+                txts.setSpeechRate(0.6f);
                 txts.speak(spike, TextToSpeech.QUEUE_FLUSH, null); } });
         btn_abcde.setOnClickListener(v -> {
-
             abclimit=false;
             buttonIndicator = "ABC";
             startStoppedTapped();
-            btn_count.setClickable(!timerStarted);
             if(timerStarted) {
+
+                Log.d(TAG,"Write Successful ");
                 btn_count.setAlpha(deactivatedButton);
+                btn_count.setClickable(false);
             }
-            else if(arrayNum == letterArray.size()){
+            else {
+                byte[] tmp = inStreamResetCounter.getBytes();
+                mBluetoothConnection.write(tmp);
                 btn_count.setAlpha(activatedButton);
+                btn_count.setClickable(true);
             }
-            else{
-                btn_count.setAlpha(activatedButton);
-            }
-
-
         });
         btn_count.setOnClickListener(v -> {
             countlimit=false;
             buttonIndicator = "COUNT";
             startStoppedTapped();
+
             btn_abcde.setClickable(!timerStarted);
             if(timerStarted) {
-                btn_abcde.setAlpha(.5f);
-            }
-            else if(arrayNumCount == countArray.size()){
-                btn_abcde.setAlpha(1f);
+                btn_abcde.setAlpha(deactivatedButton);
+                btn_abcde.setClickable(false);
+                Log.d(TAG,"Write Successful ");
             }
             else{
-                btn_abcde.setAlpha(1f);
+                byte[] tmp = inStreamResetCounter.getBytes();
+                mBluetoothConnection.write(tmp);
+                Log.d(TAG,"Write Successful ");
+                btn_abcde.setAlpha(activatedButton);
+                btn_abcde.setClickable(true);
             }
-
         });
-
-
         for(int i=0; i!=26; i++){
             buttonClick(imageButtonsAbcArray.get(i), abcMp3.get(i), letterArray.get(i));
         }
@@ -289,7 +292,6 @@ public class GetToKnow extends AppCompatActivity {
         } catch (Exception e) {
             Log.e(TAG,"Connection Failed");
         }
-
     }
     public void setPlayMP3(int letterSound){
         if(playMP3 == null) {
@@ -303,21 +305,15 @@ public class GetToKnow extends AppCompatActivity {
             playMP3.stop();
             stopplay();
         }
-
     }
     public void startStoppedTapped(){
         if(!timerStarted){
+            timer = new Timer();
           timerStarted = true;
           arrayNum =0;
           arrayNumCount=0;
           Log.d(TAG, "Timer started.");
           startTimer();
-        }
-        else if(abclimit){
-           timerStop();
-        }
-        else if(countlimit){
-           timerStop();
         }
         else {
             timerStarted = false;
@@ -327,9 +323,7 @@ public class GetToKnow extends AppCompatActivity {
             arrayNumCount=0;
            timerStop();
         }
-
     }
-
     private void startTimer(){
         timerTask = new TimerTask() {
             @Override
@@ -337,11 +331,9 @@ public class GetToKnow extends AppCompatActivity {
                 runOnUiThread(() -> {
                        if(!abclimit&&buttonIndicator.equals("ABC")) {
                            try {
-                                   getStringArray = letterArray.get(arrayNum);
-                                   byte[] tmp = getStringArray.getBytes(StandardCharsets.UTF_8);
+                                   byte[] tmp = letterArray.get(arrayNum).getBytes();
                                    mBluetoothConnection.write(tmp);
                                    setPlayMP3(abcMp3.get(arrayNum));
-                                   Log.d(TAG, "Write Successful ");
                                    mBluetoothConnection.translateText(tv_inv);
                                    arrayNum++;
                            } catch (Exception e) {
@@ -350,11 +342,9 @@ public class GetToKnow extends AppCompatActivity {
                        }
                     if(!countlimit&&buttonIndicator.equals("COUNT")) {
                         try {
-                            getStringArray = countArray.get(arrayNumCount);
-                            byte[] tmp= getStringArray.getBytes(StandardCharsets.UTF_8);
+                            byte[] tmp = countArray.get(arrayNumCount).getBytes();
                             mBluetoothConnection.write(tmp);
                             setPlayMP3(countMp3.get(arrayNumCount));
-                            Log.d(TAG,"Write Successful ");
                             mBluetoothConnection.translateText(tv_inv);
                             arrayNumCount++;
 
@@ -365,25 +355,29 @@ public class GetToKnow extends AppCompatActivity {
                        if(arrayNum==26){
                            arrayNum=0;
                            abclimit =true;
+                           btn_count.setAlpha(activatedButton);
+                           btn_count.setClickable(true);
+                           timerStarted = false;
+                           timerStop();
                        }
                     if(arrayNumCount==10){
                         arrayNumCount=0;
                         countlimit =true;
+                        btn_abcde.setAlpha(activatedButton);
+                        btn_abcde.setClickable(true);
+                        timerStarted = false;
+                        timerStop();
                     }
-
                 });
-
             }
         };
         if(buttonIndicator.equals("ABC")) {
             timer.scheduleAtFixedRate(timerTask, 0, 5000);
         }
-
         if(buttonIndicator.equals("COUNT")){
-            timer.scheduleAtFixedRate(timerTask, 0, 5000);
+            timer.scheduleAtFixedRate(timerTask, 0, 5000 );
         }
     }
-
     private void timerStop(){
         timerTask.cancel();
     }
@@ -395,12 +389,13 @@ public class GetToKnow extends AppCompatActivity {
                 Log.d(TAG,"Write Successful ");
                 mBluetoothConnection.translateText(tv_inv);
                 String tvText = tv_inv.getText().toString();
-                if (tvText.equals("7")) {
+                setPlayMP3(mp3);
+                /*if (tvText.equals("7")) {
                     setPlayMP3(mp3);
                     msg("Sensor is touched.");
                 }else{
                     msg("Braille Tech isn't touched");
-                }
+                }*/
                 tv_inv.setText("");
             }catch (Exception e)
             {
@@ -451,13 +446,11 @@ public class GetToKnow extends AppCompatActivity {
         startActivity(i);
         finish();
     }
-
     @Override
     protected void onUserLeaveHint() {
         super.onUserLeaveHint();
         if(timerStarted) timerStop();
     }
-
     @Override
     protected void onResume() {
         super.onResume();
@@ -466,5 +459,4 @@ public class GetToKnow extends AppCompatActivity {
         btn_count.setAlpha(activatedButton);
         btn_count.setClickable(true);
     }
-
 }
